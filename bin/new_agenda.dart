@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 Future<void> main(List<String> arguments) async {
-  var agenda = List<Contato>(10);
+  var agenda = List<Agenda>(10);
 
   List<String> menuOptions;
 
@@ -23,7 +23,7 @@ Future<void> main(List<String> arguments) async {
     switch (op) {
       case '1':
         var contato = getContatoFromUserInput();
-        for (var i = 0; i < agenda.length; i++) {
+        for (int i = 0; i < agenda.length; i++) {
           if (agenda[i] == null) {
             agenda[i] = contato;
             break;
@@ -37,7 +37,7 @@ Future<void> main(List<String> arguments) async {
 
         var nome = stdin.readLineSync();
 
-        Contato contato;
+        Agenda contato;
 
         stdout.writeln();
 
@@ -60,7 +60,7 @@ Future<void> main(List<String> arguments) async {
         stdout.write('Nome:');
         var nome = stdin.readLineSync();
 
-        Contato contato;
+        Agenda contato;
         int posicao;
 
         stdout.writeln();
@@ -69,6 +69,7 @@ Future<void> main(List<String> arguments) async {
           if (agenda[i]?.nome == nome) {
             contato = agenda[i];
             posicao = i;
+            break;
           }
         }
 
@@ -93,7 +94,7 @@ Future<void> main(List<String> arguments) async {
         break;
       case '4':
         var contatosParaMostrar = [];
-        for (var i = 0; i < agenda.length; i++) {
+        for (int i = 0; i < agenda.length; i++) {
           if (agenda[i] != null) {
             contatosParaMostrar.add(agenda[i]);
           }
@@ -124,8 +125,8 @@ void clear() {
   }
 }
 
-Contato getContatoFromUserInput() {
-  var contato = Contato();
+Agenda getContatoFromUserInput() {
+  var contato = Agenda();
 
   stdout.write('Inserir contato:\n\n');
 
@@ -141,7 +142,7 @@ Contato getContatoFromUserInput() {
   return contato;
 }
 
-class Contato {
+class Agenda {
   String nome;
   String telefone;
   String email;
