@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:agenda/agenda.dart';
-import 'package:agenda/contato.dart';
-
 Future<void> main(List<String> arguments) async {
+  // List com tipo fixo(definido pelo uso dos generics)
+  // e tamanho imutável(definido como parâmetro do construtor),
+  // ou seja, um Vetor.
+  var agenda = List<Agenda>(10);
+
   List<String> menuOptions;
-  Agenda agenda = Agenda();
 
   menuOptions = [
     '1 - Inserir na agenda',
@@ -17,15 +18,19 @@ Future<void> main(List<String> arguments) async {
   ];
 
   clear();
-
   stdout.writeAll(menuOptions, '\n');
   var op = stdin.readLineSync();
   while (op != '0') {
     clear();
     switch (op) {
       case '1':
-        agenda.inserir(getContatoFromUserInput());
-
+        var contato = getContatoFromUserInput();
+        for (int i = 0; i < agenda.length; i++) {
+          if (agenda[i] == null) {
+            agenda[i] = contato;
+            break;
+          }
+        }
         break;
       case '2':
         stdout.write('Consultar na agenda:\n');
@@ -34,54 +39,68 @@ Future<void> main(List<String> arguments) async {
 
         var nome = stdin.readLineSync();
 
+        Agenda contato;
+
         stdout.writeln();
 
-        var contato = agenda.contatos.firstWhere(
-          (element) => element.nome == nome,
-          orElse: () {
-            clear();
-            stdout.write('Contato não cadastrado.');
-            return null;
-          },
-        );
+        for (int i = 0; i < agenda.length; i++) {
+          if (agenda[i]?.nome == nome) {
+            contato = agenda[i];
+            break;
+          }
+        }
 
         if (contato != null) {
           stdout.write(contato);
+        } else {
+          stdout.write('Contato não cadastrado.');
         }
 
         break;
       case '3':
         stdout.write('Excluir da agenda:\n');
-
         stdout.write('Nome:');
-
         var nome = stdin.readLineSync();
+
+        Agenda contato;
+        int posicao;
 
         stdout.writeln();
 
-        var contato = agenda.contatos.firstWhere(
-          (element) => element.nome == nome,
-          orElse: () {
-            clear();
-            stdout.write('Contato não cadastrado.');
-            return null;
-          },
-        );
+        for (int i = 0; i < agenda.length; i++) {
+          if (agenda[i]?.nome == nome) {
+            contato = agenda[i];
+            posicao = i;
+            break;
+          }
+        }
 
         if (contato != null) {
           stdout.write(contato);
+
           stdout.write('Deseja mesmo excluir o contato?[S/N]\n');
           var yesOrNo = stdin.readLineSync();
           stdout.writeln();
+
           if (yesOrNo.toLowerCase().startsWith('s')) {
-            agenda.excluir(contato);
+            for (var i = posicao; i < agenda.length - 1; i++) {
+              agenda[i] = agenda[i + 1];
+            }
+
             stdout.write('O contato foi excluído!\n');
           }
+        } else {
+          stdout.write('Contato não cadastrado.');
         }
 
         break;
       case '4':
-        agenda.listar();
+        for (int i = 0; i < agenda.length; i++) {
+          if (agenda[i] != null) {
+            stdout.write(agenda[i]);
+            stdout.write('====================================\n\n');
+          }
+        }
         break;
       default:
         stdout.write('Digite uma opção válida!\n');
@@ -99,14 +118,15 @@ Future<void> main(List<String> arguments) async {
   seeYouLater();
 }
 
+// Limpa a tela pulando linhas
 void clear() {
   for (int i = 0; i < stdout.terminalLines; i++) {
     stdout.writeln();
   }
 }
 
-Contato getContatoFromUserInput() {
-  var contato = Contato();
+Agenda getContatoFromUserInput() {
+  var contato = Agenda();
 
   stdout.write('Inserir contato:\n\n');
 
@@ -122,6 +142,18 @@ Contato getContatoFromUserInput() {
   return contato;
 }
 
+class Agenda {
+  String nome;
+  String telefone;
+  String email;
+
+  @override
+  String toString() {
+    return 'Dados do Contato\n\nNome: $nome\n\nTelefone: $telefone\n\nEmail: $email\n\n';
+  }
+}
+
+// Limpa a tela e se despede do usuário contando de um até três
 void seeYouLater() async {
   clear();
   stdout.write('Saindo!\n');
